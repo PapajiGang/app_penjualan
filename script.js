@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryList = document.getElementById('category-list');
     const allCategoryBtn = document.getElementById('all-category');
 
-    const WA_NUMBER = "62895710480899";
     let products = [], cart = [];
     let formVisible = false;
 
@@ -45,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) throw new Error("HTTP error");
             products = await res.json();
             displayProducts(products);
-            renderCategories(); // tampilkan kategori
+            renderCategories();
         } catch {
             errorMessage.classList.remove('hidden');
         } finally {
@@ -100,7 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Keranjang ---
     function addToCart(id) {
         const p = products.find(x => x.id == id);
-        if (p) { cart.push(p); updateCartCounter(); showToast(`${p.title.substring(0,20)}... ditambahkan!`); }
+        if (p) { 
+            cart.push(p); 
+            updateCartCounter(); 
+            showToast(`${p.title.substring(0,20)}... ditambahkan!`); 
+        }
     }
 
     function updateCartCounter() { cartCount.textContent = cart.length; }
@@ -183,7 +186,14 @@ document.addEventListener('DOMContentLoaded', () => {
             msg += `${i+1}. ${item.title} - Rp ${price.toLocaleString('id-ID')}\n`;
         });
         msg += `\nTotal: Rp ${total.toLocaleString('id-ID')}\nNama: ${name}\nNo HP: ${phone}\nAlamat: ${address}`;
-        window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+
+        // Konversi 08… menjadi 62…
+        let waNumber = phone.replace(/\D/g,'');
+        if (waNumber.startsWith('0')) {
+            waNumber = '62' + waNumber.slice(1);
+        }
+
+        window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
 
         hideForm();
         cart = [];
