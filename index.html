@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toko Online Modern</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100">
+
+<!-- Header -->
+<header class="bg-white shadow-md sticky top-0 z-40">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-800">TokoKu</h1>
+        <div class="relative">
+            <i class="fas fa-shopping-cart text-gray-600 text-2xl cursor-pointer"></i>
+            <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="container mx-auto p-4 md:p-8">
+    <div class="flex flex-col md:flex-row gap-6">
+
+        <!-- Sidebar Kategori -->
+        <aside class="md:w-1/4 bg-white p-4 rounded-lg shadow-sm">
+            <h2 class="font-semibold mb-4 text-gray-800">Kategori</h2>
+            <ul id="category-list" class="space-y-2">
+                <!-- Daftar kategori akan diisi JS -->
+            </ul>
+            <button id="all-category" class="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors">Semua</button>
+        </aside>
+
+        <!-- Produk Grid -->
+        <section class="flex-1">
+            <div id="loader" class="text-center py-10">
+                <i class="fas fa-spinner fa-spin text-4xl text-blue-500"></i>
+                <p class="mt-2 text-gray-600">Memuat produk...</p>
+            </div>
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+            <div id="error-message" class="hidden text-center bg-red-100 text-red-700 p-4 rounded-lg">
+                <p>Gagal memuat produk. Silakan coba lagi nanti.</p>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<!-- Product Modal -->
+<div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="p-4 sm:p-6">
+            <div class="flex justify-between items-center pb-3 border-b">
+                <h3 class="text-xl font-semibold text-gray-900" id="modal-title">Detail Produk</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+            <div class="mt-4 md:flex md:space-x-6">
+                <div class="md:w-1/2 flex-shrink-0">
+                    <img id="modal-image" src="https://placehold.co/400x400" alt="Product Image" class="w-full h-auto object-contain rounded-lg max-h-80">
+                </div>
+                <div class="mt-4 md:mt-0 md:w-1/2">
+                    <span id="modal-category" class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Kategori</span>
+                    <h4 class="text-2xl font-bold text-gray-800 my-2" id="modal-product-name">Nama Produk</h4>
+                    <p class="text-3xl font-light text-blue-600 mb-4" id="modal-price">Rp 0</p>
+                    <p class="text-gray-600 text-sm leading-relaxed" id="modal-description">Deskripsi produk akan muncul di sini.</p>
+                    <button id="modal-add-to-cart" class="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+                        <i class="fas fa-cart-plus"></i><span>Tambah ke Keranjang</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50"></div>
+
+<!-- Cart Modal -->
+<div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="p-4 sm:p-6">
+            <div class="flex justify-between items-center pb-3 border-b">
+                <h3 class="text-xl font-semibold text-gray-900">Keranjang Belanja</h3>
+                <button id="closeCartBtn" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+
+            <!-- Item List -->
+            <div id="cart-items" class="mt-4">
+                <p class="text-gray-600 text-sm">Keranjang kosong.</p>
+            </div>
+
+            <!-- Form Data (default hidden) -->
+            <div id="checkout-form" class="mt-4 space-y-2 hidden">
+                <input type="text" id="customer-name" placeholder="Nama Lengkap" class="w-full border rounded px-3 py-2">
+                <input type="text" id="customer-phone" placeholder="No. HP" class="w-full border rounded px-3 py-2">
+                <textarea id="customer-address" placeholder="Alamat" class="w-full border rounded px-3 py-2"></textarea>
+            </div>
+
+            <!-- Total dan Tombol -->
+            <div class="mt-6 border-t pt-4 flex flex-col space-y-2">
+                <p class="text-lg font-bold text-gray-800">Total: <span id="cart-total">Rp 0</span></p>
+                <button id="orderBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                    Isi Data
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-gray-200 mt-10">
+    <div class="container mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Tentang Toko -->
+        <div>
+            <h3 class="text-xl font-bold mb-3">TokoKu</h3>
+            <p class="text-gray-400 text-sm">
+                Toko online modern dengan berbagai produk pilihan. Kami menyediakan pengalaman belanja yang mudah, aman, dan cepat.
+            </p>
+        </div>
+
+        <!-- Link Cepat -->
+        <div>
+            <h4 class="text-lg font-semibold mb-3">Link Cepat</h4>
+            <ul class="space-y-2 text-gray-400">
+                <li><a href="#" class="hover:text-white transition-colors">Beranda</a></li>
+                <li><a href="#" class="hover:text-white transition-colors">Produk</a></li>
+                <li><a href="#" class="hover:text-white transition-colors">Kategori</a></li>
+                <li><a href="#" class="hover:text-white transition-colors">Kontak</a></li>
+            </ul>
+        </div>
+
+        <!-- Kontak -->
+        <div>
+            <h4 class="text-lg font-semibold mb-3">Kontak</h4>
+            <ul class="space-y-2 text-gray-400">
+                <li><i class="fas fa-phone-alt mr-2"></i> +62 895-7104-80899</li>
+                <li><i class="fas fa-envelope mr-2"></i> info@tokoku.com</li>
+                <li><i class="fas fa-map-marker-alt mr-2"></i> Ponorogo, Indonesia</li>
+            </ul>
+            <div class="mt-4 flex space-x-3">
+                <a href="https://facebook.com/profile.php?id=100069612746749" class="hover:text-white transition-colors"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://tiktok.com/@yogaand132" class="hover:text-white transition-colors"><i class="fab fa-tiktok"></i></a>
+                <a href="https://instagram.com/yogaand_11320" class="hover:text-white transition-colors"><i class="fab fa-instagram"></i></a>
+                <a href="https://x.com/yogaandri1320" class="hover:text-white transition-colors"><i class="fab fa-twitter"></i></a>
+                <a href="https://wa.me/628817077163" class="hover:text-white transition-colors"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Copyright -->
+    <div class="border-t border-gray-700 mt-6 pt-4 text-center text-gray-500 text-sm">
+        &copy; 2025 TokoKu. Semua hak dilindungi.
+    </div>
+</footer>
+
+<script src="script.js" defer></script>
+</body>
+</html>

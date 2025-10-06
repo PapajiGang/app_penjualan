@@ -1,0 +1,54 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.product-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+
+#productModal { transition: opacity 0.3s ease; }
+
+.toast-notification { 
+    animation: toast-in 0.5s ease-out forwards; 
+}
+
+@keyframes toast-in {
+    from { transform: translateX(100%); opacity:0; }
+    to { transform: translateX(0); opacity:1; }
+}
+
+.category-btn {
+    padding: 0.5rem 1rem;
+    background-color: #e5e7eb;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.category-btn.active, .category-btn:hover {
+    background-color: #3b82f6;
+    color: #fff;
+}
+
+/* Sidebar kategori */
+#category-list li {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background 0.2s;
+}
+
+#category-list li:hover {
+    background-color: #DBEAFE; /* bg-blue-100 */
+}
+
+/* Responsive: sidebar atas grid di mobile */
+@media (max-width: 768px) {
+    main > div {
+        flex-direction: column;
+    }
+}
